@@ -39,6 +39,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
+    '@nuxtjs/style-resources',
     [
       '@nuxtjs/fontawesome',
       {
@@ -78,5 +79,9 @@ export default {
   loading: {
     color: '#00bfff',
     height: '5px'
+  },
+  loader: {
+    test: /\.s[a|c]ss$/,
+    loader: 'style!css!sass'
   }
 }

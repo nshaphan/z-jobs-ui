@@ -16,22 +16,23 @@
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a
-              v-if="isLoggedIn"
-              class="nav-link active"
-              aria-current="page"
-              style="cursor: pointer"
-              @click.prevent="signOut()"
-              >Sign out</a
-            >
             <nuxt-link
               v-if="!isLoggedIn"
               class="nav-link active"
               aria-current="page"
-              to="signin"
-              >Sign in</nuxt-link
+              to="/"
+              >Apply</nuxt-link
             >
           </li>
+          <li class="nav-item">
+            <nuxt-link
+              v-if="!isLoggedIn"
+              class="nav-link active"
+              aria-current="page"
+              to="applications"
+              >Applications</nuxt-link>
+          </li>
+
         </ul>
       </div>
     </div>

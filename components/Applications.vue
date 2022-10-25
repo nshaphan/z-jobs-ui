@@ -25,7 +25,7 @@
             :key="application.id"
             class="list-group-item list-group-item-action mb-2 border rounded"
             style="cursor: pointer"
-            @click="showApplicationDetailsModal = true"
+            @click="showApplication(application)"
           >
             <div class="w-100">
               <h5 class="mb-1 text-dark">{{ application.name }}  <span class="badge bg-info">PENDING</span></h5>
@@ -48,35 +48,39 @@
     <!-- Modal -->
     <Modal :show="showApplicationDetailsModal" show-close show-header @close="showApplicationDetailsModal = false">
       <div class="mt-2 mr-4">
-        <h1 class="main-heading mt-0">Shaphan Nzabonimana</h1>
+        <h1 class="main-heading mt-0">{{ currentApplication?.name }}</h1>
         <div>
-          <button class="btn border rounded-0">
+          <a class="btn border rounded-0" :href="currentApplication.resume">
         <fa-icon
           icon="download"
           regular
           class="text-primary"
         ></fa-icon>
-        Download CV</button> <span class="ms-2 text-secondary"> | <span class="ps-2">Applied on October 25, 2022</span></span>
+        Download CV</a> <span class="ms-2 text-secondary"> | <span class="ps-2">
+        Applied on {{ currentApplication && new Intl.DateTimeFormat('en-US', {
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+              }).format(new Date(currentApplication?.createdAt || "")) }}</span></span>
         </div>
 
           <div>
             <div class="mt-4">
               <!-- Application Details -->
               <div>
-                <h4 class="text-secondary">Software Engineer <span class="badge bg-info">PENDING</span></h4>
+                <h4 class="text-secondary">{{ currentApplication?.position }} <span class="badge bg-info">{{ currentApplication?.status }}</span></h4>
               </div>
               <div>
-                <span class="fw-bold">Email: </span> shaphannzabonimana@gmail.com
+                <span class="fw-bold">Email: </span> {{ currentApplication?.email }}
               </div>
               <div>
-                <span class="fw-bold">Phone: </span> +250 788 000 000
+                <span class="fw-bold">Phone: </span> {{ currentApplication?.phone }}
               </div>
 
               <div class="mt-4">
                 <h5>Cover Letter</h5>
                 <p>
-                  Hello,
-                  I am a software engineer with 3 years of experience in web development. I am interested in the position you are offering. I have worked on several projects and I am confident that I can deliver on this project.
+                  {{ currentApplication?.coverLetter }}
                 </p>
               </div>
             </div>
@@ -109,6 +113,7 @@ interface ComponentData {
   filter: string;
   applications: IApplication[]
   showApplicationDetailsModal: boolean
+  currentApplication?: IApplication | null
 }
 
 export default Vue.extend({
@@ -118,7 +123,8 @@ export default Vue.extend({
     return {
       filter: 'all',
       applications: [],
-      showApplicationDetailsModal: false
+      showApplicationDetailsModal: false,
+      currentApplication: null
     }
   },
   async fetch() {
@@ -142,7 +148,10 @@ export default Vue.extend({
     }
   },
   methods: {
-
+    showApplication(application: IApplication) {
+      this.currentApplication = application
+      this.showApplicationDetailsModal = true
+    }
   },
 })
 </script>

@@ -4,7 +4,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Product Review',
+    title: 'Z-Jobs - Join Us',
     htmlAttrs: {
       lang: 'en'
     },

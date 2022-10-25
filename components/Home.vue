@@ -30,6 +30,7 @@
                 type="text"
                 class="form-control form-control-lg fw-bold text-dark border-1"
                 placeholder="Enter your name"
+                :disabled="formLoading"
               />
               <label for="name">Name</label>
             </div>
@@ -42,6 +43,7 @@
                 type="email"
                 class="form-control form-control-lg fw-bold text-dark border-1"
                 placeholder="Enter your email"
+                :disabled="formLoading"
               />
               <label for="email">Email</label>
             </div>
@@ -54,6 +56,7 @@
                 type="text"
                 class="form-control form-control-lg fw-bold text-dark border-1"
                 placeholder="Enter your phone"
+                :disabled="formLoading"
               />
               <label for="phone">Phone</label>
             </div>
@@ -66,6 +69,7 @@
                 type="file"
                 placeholder="Upload your CV"
                 accept=".pdf"
+                :disabled="formLoading"
                 @change="onFileChange($event)"
               >
             </div>
@@ -78,6 +82,7 @@
                         name="coverLetter"
                         placeholder="Cover Letter"
                         rows="5"
+                        :disabled="formLoading"
                       />
                 <label for="coverLetter">Cover Letter</label>
 
@@ -95,11 +100,16 @@
                 Cancel
               </button>
               <button
+                v-if="!formLoading"
                 type="button"
                 class="btn btn-primary"
                 @click="apply()"
               >
                 Submit
+              </button>
+              <button v-if="formLoading" class="btn btn-primary" type="button" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Submitting...
               </button>
             </div>
           </div>
@@ -120,6 +130,7 @@ interface ComponentData {
   formErrors: {
     [x: string]: string
   }
+  formLoading: boolean
 }
 
 export default Vue.extend({
@@ -134,6 +145,7 @@ export default Vue.extend({
         resume: '',
         coverLetter: '',
       },
+      formLoading: false,
       newApplication: {
         name: '',
         email: '',
@@ -146,6 +158,7 @@ export default Vue.extend({
   },
   methods: {
     apply() {
+      this.formLoading = true
       this.$applicationService.CreateApplication({
         name: this.newApplication.name,
         email: this.newApplication.email,
@@ -156,6 +169,7 @@ export default Vue.extend({
         .then(() => {
           this.showApplyModal = false
           this.$toast.success('Application Submitted')
+          this.formLoading = false
         })
         .catch((err) => {
           if (err.response.data?.errors?.length) {
@@ -168,6 +182,7 @@ export default Vue.extend({
           } else {
             this.$toast.error(err.response.data.message || "Error Occurred!")
           }
+          this.formLoading = false
         })
     },
     onFileChange($event: Event) {

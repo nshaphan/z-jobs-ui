@@ -14,6 +14,9 @@ export interface IApplicationsResponse {
   success: boolean;
   message: string;
   applications: IApplication[]
+  total: number
+  pages: number
+  page: number
 }
 
 export interface IApplicationResponse {

@@ -12,9 +12,9 @@
             class="form-select form-select-lg fw-bold text-dark border-1"
           >
             <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="accepted">Accepted</option>
-            <option value="rejected">Rejected</option>
+            <option value="PENDING">Pending</option>
+            <option value="PASSED">Accepted</option>
+            <option value="DROPPED">Rejected</option>
           </select>
           <label for="status">Status</label>
         </div>
@@ -28,7 +28,21 @@
             @click="showApplication(application)"
           >
             <div class="w-100">
-              <h5 class="mb-1 text-dark">{{ application.name }}  <span class="badge bg-info">PENDING</span></h5>
+              <h5 class="mb-1 text-dark">{{ application.name }}
+                  <span
+                    v-if="application?.status !== 'PENDING'"
+                    class="badge"
+                    :class="application.status === 'PASSED' ? 'bg-success' : 'bg-danger'"
+                  >
+                    {{ application?.status }}
+                  </span>
+                  <span
+                    v-if="application?.status === 'PENDING'"
+                    class="badge bg-info"
+                  >
+                    {{ application?.status }}
+                  </span>
+              </h5>
               <p class="mb-2 text-secondary">{{ application.position}}</p>
               <small>{{ new Intl.DateTimeFormat('en-US', {
                 month: "long",
@@ -40,7 +54,16 @@
           <div v-if="filteredApplications.length === 0" class="text-center">
             <h3 class="text-secondary">No applications found</h3>
           </div>
-
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              <li class="page-item">
+                <a class="page-link" href="#" tabindex="-1" :class="pagination.page===1 ? 'disabled': ''" @click.prevent="prev()">Prev</a>
+              </li>
+              <li class="page-item ms-2">
+                <a class="page-link" href="#" :class="pagination.page === pagination.pages ? 'disabled': ''" @click.prevent="next()">Next</a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
@@ -68,7 +91,21 @@
             <div class="mt-4">
               <!-- Application Details -->
               <div>
-                <h4 class="text-secondary">{{ currentApplication?.position }} <span class="badge bg-info">{{ currentApplication?.status }}</span></h4>
+                <h4 class="text-secondary">{{ currentApplication?.position }}
+                  <span
+                    v-if="currentApplication?.status !== 'PENDING'"
+                    class="badge"
+                    :class="currentApplication?.status === 'PASSED' ? 'bg-success' : 'bg-danger'"
+                  >
+                    {{ currentApplication?.status }}
+                  </span>
+                  <span
+                    v-if="currentApplication?.status === 'PENDING'"
+                    class="badge bg-info"
+                  >
+                    {{ currentApplication?.status }}
+                  </span>
+                </h4>
               </div>
               <div>
                 <span class="fw-bold">Email: </span> {{ currentApplication?.email }}
@@ -87,14 +124,15 @@
             <div class="modal-footer border-top-0">
               <button
                 type="button"
-                class="btn btn-light"
-                @click="showApplicationDetailsModal = false"
+                class="btn btn-danger"
+                @click="changeStatus('rejected')"
               >
                 Reject
               </button>
               <button
                 type="button"
                 class="btn btn-primary"
+                @click="changeStatus('accepted')"
               >
                 Accept
               </button>
@@ -109,11 +147,20 @@
 import Vue from 'vue'
 import {IApplication} from "~/services/types";
 
+interface Pagination {
+  page: number;
+  total: number;
+  limit?: number;
+  pages: number;
+}
+
 interface ComponentData {
   filter: string;
   applications: IApplication[]
   showApplicationDetailsModal: boolean
   currentApplication?: IApplication | null
+  pagination: Pagination
+  formLoading: boolean
 }
 
 export default Vue.extend({
@@ -124,12 +171,24 @@ export default Vue.extend({
       filter: 'all',
       applications: [],
       showApplicationDetailsModal: false,
-      currentApplication: null
+      currentApplication: null,
+      formLoading: false,
+      pagination: {
+        page: 1,
+        total: 0,
+        limit: 10,
+        pages: 0,
+      }
     }
   },
   async fetch() {
-    const res = await this.$applicationService.GetApplications()
+    const res = await this.$applicationService.GetApplications(this.pagination.page)
     this.applications = res.applications
+    this.pagination = {
+      page: res.page,
+      total: res.total,
+      pages: res.pages
+    }
   },
   computed: {
     isLoggedIn () {
@@ -151,6 +210,28 @@ export default Vue.extend({
     showApplication(application: IApplication) {
       this.currentApplication = application
       this.showApplicationDetailsModal = true
+    },
+
+    changeStatus(status: string) {
+      this.$applicationService.ChangeApplicationStatus(Number(this.currentApplication?.id), status)
+        .then((res) => {
+          this.currentApplication = res.application
+          this.currentApplication = null
+          this.showApplicationDetailsModal = false
+          this.$toast.success('Status changed successfully')
+          this.$fetch()
+        })
+        .catch((err) => {
+          this.$toast.error(err.message)
+        })
+    },
+    next() {
+      this.pagination.page += 1
+      this.$fetch()
+    },
+    prev() {
+      this.pagination.page -= 1
+      this.$fetch()
     }
   },
 })

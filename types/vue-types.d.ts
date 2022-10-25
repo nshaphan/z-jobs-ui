@@ -2,8 +2,9 @@ import { INewApplicationInput, ICreateApplicationResponse, IApplicationsResponse
 declare module 'vue/types/vue' {
   interface Vue {
     $applicationService: {
-      GetApplications: () => Promise<IApplicationsResponse>,
+      GetApplications: (page: number) => Promise<IApplicationsResponse>,
       CreateApplication: (application: INewApplicationInput) => Promise<ICreateApplicationResponse>,
+      ChangeApplicationStatus: (id: number, status: string) => Promise<ICreateApplicationResponse>
     }
 
     // nuxt runtime

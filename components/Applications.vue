@@ -50,7 +50,7 @@
       <div class="mt-2 mr-4">
         <h1 class="main-heading mt-0">{{ currentApplication?.name }}</h1>
         <div>
-          <a class="btn border rounded-0" :href="currentApplication.resume">
+          <a class="btn border rounded-0" :href="currentApplication?.resume">
         <fa-icon
           icon="download"
           regular

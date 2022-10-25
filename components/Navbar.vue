@@ -17,7 +17,7 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <nuxt-link
-              v-if="!isLoggedIn"
+
               class="nav-link active"
               aria-current="page"
               to="/"
@@ -26,7 +26,6 @@
           </li>
           <li class="nav-item">
             <nuxt-link
-              v-if="!isLoggedIn"
               class="nav-link active"
               aria-current="page"
               to="applications"
@@ -44,19 +43,5 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'NavBar',
-  computed: {
-    isLoggedIn () {
-      return this.$store.getters["user/isLoggedIn"]
-    }
-  },
-  mounted() {
-    this.$store.dispatch("user/logOn")
-  },
-  methods: {
-    signOut() {
-      this.$store.dispatch("user/logOut")
-      return this.$router.push('/signin')
-    },
-  },
 })
 </script>

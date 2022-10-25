@@ -191,12 +191,6 @@ export default Vue.extend({
     }
   },
   computed: {
-    isLoggedIn () {
-      return this.$store.getters["user/isLoggedIn"]
-    },
-    user() {
-      return this.$store.getters["user/user"]
-    },
     filteredApplications: {
       get(): IApplication[] {
         if (this.filter === 'all') {
